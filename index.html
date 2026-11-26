@@ -1,1 +1,1772 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ — АтомДомСтрой</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #27ae60; --bg: #f4f4f4; --white: #ffffff; --orange: #e67e22; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 0; line-height: 1.5; }
+        .layout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 5px; }
+        .layout-card { border: 2px solid #eee; border-radius: 6px; padding: 8px; cursor: pointer; transition: all 0.2s ease; text-align: center; background: #fff; }
+        .layout-card:hover { border-color: var(--accent); background: #f9fffb; }
+        .layout-card.active { border-color: var(--accent); background: #e8f5e9; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .layout-card img { width: 100%; height: 60px; object-fit: contain; margin-bottom: 5px; border-radius: 3px; }
+        .layout-card span { font-size: 11px; font-weight: bold; color: var(--primary); display: block; }
+        .layout-icon-placeholder { height: 60px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; color: #999; font-size: 10px; margin-bottom: 5px; border-radius: 3px; }
+        
+        .main-wrapper { display: flex; height: 100vh; overflow: hidden; }
+        .settings-panel { width: 40%; padding: 20px; overflow-y: auto; background: #fff; border-right: 2px solid #ddd; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+        
+        .preview-panel { 
+            width: 60%; 
+            padding: 40px 20px; 
+            overflow-y: auto;
+            background: #525659; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        .container { 
+            width: 100%; 
+            max-width: 800px; 
+            background: var(--white); 
+            padding: 40px; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.3); 
+            border-radius: 4px; 
+            height: auto; 
+            min-height: 297mm;
+            margin-bottom: 20px; 
+            position: relative; 
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
 
+        header { border-bottom: 2px solid var(--primary); margin-bottom: 20px; padding-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .company-logo { width: 80px; height: 80px; object-fit: contain; }
+        .company-info h1 { font-size: 16px; margin: 0; text-transform: uppercase; color: #7f8c8d; letter-spacing: 1px; }
+        .company-info h2 { font-size: 26px; margin: 0; color: var(--accent); font-weight: 800; line-height: 1.1; }
+        .contacts-top { text-align: right; font-size: 13px; color: #555; }
+        .contacts-top a { color: var(--primary); text-decoration: none; font-weight: bold; }
+        .client-data-input { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; background: #e8f4fd; padding: 15px; border-radius: 6px; }
+        details { background: #fdfdfd; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 4px; overflow: hidden; }
+        summary { padding: 12px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; list-style: none; outline: none; }
+        .content-box { padding: 15px; }
+        .client-info-display { display: block; margin-bottom: 20px; font-size: 16px; border-left: 4px solid var(--accent); padding-left: 15px; }
+        .doc-meta { display: flex; justify-content: space-between; font-size: 14px; color: #7f8c8d; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .table-header-print { display: flex; justify-content: space-between; font-weight: bold; padding: 10px 5px; border-bottom: 2px solid #ddd; background: #f9f9f9; font-size: 14px; margin-bottom: 5px; }
+        .print-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 8px 5px; font-size: 14px; gap: 10px; }
+        .print-col-name { flex: 3; }
+        .print-col-qty { width: 80px; text-align: center; color: #555; }
+        .print-col-price { width: 100px; text-align: right; font-weight: bold; }
+        .category-header { background: #f0f2f5; padding: 8px 10px; font-weight: bold; margin-top: 15px; border-left: 3px solid var(--primary); font-size: 14px; }
+        .item { display: flex; flex-direction: column; border-bottom: 1px solid #eee; padding: 6px 5px; gap: 5px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; gap: 10px; }
+        input[type="text"], select, input[type="number"], textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; margin-top: 5px; font-size: 14px; }
+        input::placeholder { color: #aaa; opacity: 1; }
+        .qty-input { width: 45px !important; padding: 4px !important; text-align: center; }
+        .price-input-manual { width: 80px !important; padding: 4px !important; text-align: right; font-weight: bold; border: 1px solid #27ae60; background: #eee; cursor: not-allowed; }
+        .price-input-override { width: 80px !important; padding: 4px !important; text-align: right; border: 1px solid #e67e22; background: #fff; font-weight: bold; }
+        .delivery-section-settings { background: #ebf2f7; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #ddd; }
+        .btn { border: none; padding: 12px; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 4px; color: white; transition: 0.3s; width: 100%; }
+        .btn-delivery-info { background: #34495e; cursor: default; margin-top: 10px; }
+        .btn-total-info { background: var(--orange); font-size: 18px; margin-top: 10px; cursor: default; }
+        .cashless-settings-row { display: flex; align-items: center; background: #ecf0f1; padding: 10px; margin-top: 8px; border-radius: 4px; gap: 10px; border-left: 4px solid #bdc3c7; }
+        .cashless-row-print { display: none; justify-content: space-between; padding: 4px 0; font-size: 14px; color: #444; font-weight: bold; }
+        .btn-reset { background: #e74c3c; margin-bottom: 10px; }
+        .btn-hide-prices { background: #7f8c8d; margin-bottom: 5px; }
+        .btn-print { background: var(--accent); }
+        
+        .btn-show-more { background: #f8f9fa; border: 1px solid #ddd; color: #555; font-size: 12px; font-weight: 600; text-transform: none; margin-top: 10px; padding: 8px; border-radius: 4px; text-align: center; cursor: pointer; width: 100%; transition: background 0.2s; }
+        .btn-show-more:hover { background: #e9ecef; }
+        .expandable-content { display: none; }
+        .expandable-content.expanded { display: block; }
+
+        .action-buttons-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; width: 100%; max-width: 800px; }
+        .btn-client-order { background: #27ae60; font-size: 12px; padding: 12px; }
+        .btn-copy-text { background: #d35400; font-size: 12px; padding: 12px; }
+
+        .total-bar { background: var(--primary); color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; font-weight: bold; border-radius: 5px; margin-top: 30px; }
+        .price-val { color: var(--orange); }
+        
+        #layoutPreviewContainer { 
+            display: none; 
+            text-align: center; 
+            margin-top: 30px; 
+            margin-bottom: 20px; 
+            border: 1px solid #eee; 
+            padding: 10px; 
+            border-radius: 6px; 
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        #layoutImage { max-width: 100%; max-height: 400px; height: auto; border-radius: 4px; }
+        
+        .col-header-settings { display: flex; justify-content: flex-end; gap: 10px; font-size: 10px; color: #777; margin-bottom: 5px; padding-right: 5px; }
+        .print-note-box { margin-top: 20px; padding: 10px; border-left: 3px solid #ccc; font-style: italic; font-size: 14px; color: #555; display: none; white-space: pre-wrap; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-container { background: white; width: 95%; max-width: 900px; height: 85vh; border-radius: 8px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow: hidden; }
+        .modal-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { margin: 0; font-size: 18px; color: var(--primary); }
+        .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #777; }
+        .modal-body { padding: 20px; overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; }
+        .modal-footer { padding: 15px 20px; background: #f8f9fa; border-top: 1px solid #ddd; display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-inputs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 15px; }
+        .modal-inputs-grid div label { font-size: 11px; color: #666; display: block; margin-bottom: 3px; font-weight: bold; }
+        .modal-inputs-grid input { margin-top: 0; padding: 6px; font-size: 13px; }
+        .modal-text-preview { width: 100%; flex-grow: 1; min-height: 420px; font-family: monospace; font-size: 13px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical; background: #fafafa; }
+
+        body.hide-prices-active .table-header-print .print-col-price, 
+        body.hide-prices-active .print-row .print-col-price { display: none !important; }
+
+        @media print {
+            @page { margin: 10mm; size: auto; }
+            .settings-panel, .no-print, .modal-overlay, .action-buttons-group { display: none !important; }
+            .preview-panel { padding: 0; background: white; width: 100%; overflow: visible; display: block; }
+            .container { box-shadow: none; width: 100%; border: none; min-height: auto; padding: 0; margin: 0; }
+            .main-wrapper { display: block; height: auto; overflow: visible; }
+            details summary { display: none; }
+            details { border: none; }
+            .table-header-print { background: #eee !important; -webkit-print-color-adjust: exact; }
+            .print-row { page-break-inside: avoid; }
+            .category-header { page-break-after: avoid; }
+            .total-bar { page-break-inside: avoid; margin-top: 30px; }
+            #extraPaymentBlock { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="settings-panel no-print">
+        <h3 style="margin-top:0">Настройка КП</h3>
+        
+        <button class="btn btn-reset" onclick="resetCalculator()">ОБНУЛИТЬ РАСЧЁТ</button>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="font-size: 12px; font-weight: bold; color: #e74c3c;">Примечание (скрыто в КП):</label>
+            <textarea id="internalNote" rows="2" placeholder="Заметки для себя..." style="font-size: 12px; border-color: #fab1a0;"></textarea>
+        </div>
+
+        <div class="client-data-input">
+            <input type="text" id="clientNameInput" placeholder="ФИО Заказчика" oninput="syncClient()">
+            <input type="text" id="clientPhoneInput" placeholder="Контактный номер" oninput="syncClient()">
+            <input type="text" id="clientArrivalInput" placeholder="Заезд" oninput="syncClient()">
+            <input type="text" id="clientAddrInput" placeholder="Адрес объекта" oninput="syncClient()">
+        </div>
+
+        <details open>
+            <summary>1. Размер конструкции</summary>
+            <div class="content-box">
+                <select id="sizeSelect" onchange="handleSizeChange()" oninput="handleSizeChange()">
+                    <option value="">-- Выберите габариты --</option>
+                    <optgroup label="Бытовки">
+                        <option value="2x23">2 х 2.3 м</option>
+                        <option value="3x23" selected>3 х 2.3 м</option>
+                        <option value="4x23">4 х 2.3 м</option>
+                        <option value="5x23">5 х 2.3 м</option>
+                        <option value="6x23">6 х 2.3 м</option>
+                        <option value="7x23">7 х 2.3 м</option>
+                    </optgroup>
+                    <optgroup label="Блок-контейнеры">
+                        <option value="bk3">3.0 х 2.4 х 2.4 м</option>
+                        <option value="bk4">4.0 х 2.4 х 2.4 м</option>
+                        <option value="bk5">5.0 х 2.4 х 2.4 м</option>
+                        <option value="bk585">5.85 х 2.4 х 2.4 м</option>
+                        <option value="bk7">7.0 х 2.4 х 2.4 м</option>
+                    </optgroup>
+                </select>
+                
+                <div style="margin-top: 10px;">
+                    <label class="layout-card" style="display: flex; align-items: center; gap: 10px; text-align: left; padding: 10px;" id="raspashonkaCard">
+                        <input type="checkbox" id="raspashonkaCheck" onchange="toggleRaspashonka()" style="width: 18px; height: 18px; margin: 0;">
+                        <div>
+                            <span style="font-size: 13px; font-weight: bold; color: var(--primary);">Бытовка РАСПАШОНКА</span>
+                            <span style="font-size: 11px; color: #666; font-weight: normal;">(дверь по центру, окна слева и справа)</span>
+                        </div>
+                    </label>
+                </div>
+
+                <input type="hidden" id="basePriceManual" value="0">
+            </div>
+        </details>
+
+        <details open>
+            <summary>2. Планировка</summary>
+            <div class="content-box">
+                <div class="layout-grid" id="layoutGrid"></div>
+                <div id="layoutExpandable" class="expandable-content">
+                    <div class="layout-grid" id="layoutGridMore" style="margin-top: 0;"></div>
+                </div>
+                <button type="button" class="btn-show-more" id="layoutToggleBtn" onclick="toggleSection('layoutExpandable', this)">Показать остальные варианты</button>
+            </div>
+        </details>
+
+        <details id="outerFinishDetailsSettings" open>
+            <summary>3. Варианты отделки снаружи</summary>
+            <div class="content-box">
+                <div class="col-header-settings">
+                    <span style="width:45px; text-align:center">Кол-во</span>
+                    <span style="width:80px; text-align:center">Цена</span>
+                    <span style="width:80px; text-align:center">Своя цена</span>
+                </div>
+                <div id="outerFinishListSettings">
+                    <small style="color:gray">Сначала выберите размер в п.1</small>
+                </div>
+            </div>
+        </details>
+
+        <details id="finishDetailsSettings" open>
+            <summary>4. Варианты отделки внутри</summary>
+            <div class="content-box">
+                <div class="col-header-settings">
+                    <span style="width:45px; text-align:center">Кол-во</span>
+                    <span style="width:80px; text-align:center">Цена</span>
+                    <span style="width:80px; text-align:center">Своя цена</span>
+                </div>
+                <div id="finishListSettings">
+                    <small style="color:gray">Сначала выберите размер в п.1</small>
+                </div>
+            </div>
+        </details>
+
+        <details id="extraDetailsSettings" open>
+            <summary>5. Дополнительные услуги</summary>
+            <div class="content-box">
+                <div id="extraListSettings">
+                    <small style="color:orange">Выберите отделку в п.4</small>
+                </div>
+            </div>
+        </details>
+
+        <div class="delivery-section-settings">
+            <label><b>6. Доставка</b></label>
+            <div style="margin-top:10px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="deliveryEnable" onchange="calculate()" style="width: 18px; height: 18px; margin: 0;">
+                <span style="font-size: 14px;">Включить доставку в расчёт</span>
+            </div>
+            <div id="deliveryInputs" style="display:none; margin-top: 10px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size: 11px; color: #555; display: block; margin-bottom: 2px;">База погрузки:</label>
+                        <select id="prodPoint" onchange="calculate()">
+                            <option value="shchyolkovo">Щёлково</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; color: #555; display: block; margin-bottom: 2px;">км (от базы до участка):</label>
+                        <input type="number" id="distance" value="0" min="0" oninput="calculate()" placeholder="КМ">
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <label style="font-size: 12px; color: #555;">Машин:</label>
+                    <input type="number" id="deliveryQty" value="1" min="1" oninput="calculate()" style="margin-top: 5px;">
+                </div>
+            </div>
+            <div class="btn btn-delivery-info">Доставка: <input type="number" id="deliveryPriceManual" value="0" oninput="calculate()" class="price-input-manual" style="margin-left:10px; background: #fff; cursor: text;" readonly="false"> р.</div>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <label><b>7. Примечание для КП</b></label>
+            <textarea id="noteInput" rows="3" placeholder="Эта информация будет видна заказчику..." oninput="syncNote()"></textarea>
+        </div>
+
+        <div class="btn btn-total-info">Итого: <span id="sideTotalVal">0</span> руб.</div>
+        
+        <div class="cashless-settings-row">
+            <input type="checkbox" id="checkNoNds" onchange="calculate()">
+            <label for="checkNoNds"><b>Без НДС 13%:</b> <span id="sideNoNds">0</span> р.</label>
+        </div>
+        <div class="cashless-settings-row">
+            <input type="checkbox" id="checkWithNds" onchange="calculate()">
+            <label for="checkWithNds"><b>С НДС 22%:</b> <span id="sideWithNds">0</span> р.</label>
+        </div>
+
+        <div class="btn-group" style="margin-top: 15px;">
+            <button class="btn btn-hide-prices" id="hidePricesBtn" onclick="togglePrices()">Скрыть цены</button>
+            <button class="btn btn-reset" onclick="resetCalculator()">Обнулить Расчёт</button>
+            <button class="btn btn-print" onclick="window.print()">Скачать / Печать КП</button>
+        </div>
+    </div>
+
+    <div class="preview-panel">
+        <div class="container" id="printableArea">
+            <header>
+                <div class="logo-section">
+                    <img class="company-logo" src="https://drive.google.com/thumbnail?id=17-gJnItaiYjG6m4EZESKhR2Exf0W472L&sz=w500" alt="Логотип">
+                    <div class="company-info">
+                        <h1>КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</h1>
+                        <h2>АтомДомСтрой</h2>
+                    </div>
+                </div>
+                <div class="contacts-top">
+                    Тел.: <b>7 (966) 888-95-41</b><br>
+                    WhatsApp: <b>7 (900) 528-13-86</b><br>
+                    E-mail: <a href="mailto:AtomDomStroy@yandex.ru">AtomDomStroy@yandex.ru</a><br>
+                    Telegram: <b>@ADomStroy</b>
+                </div>
+            </header>
+
+            <div class="client-info-display">
+                <div id="dispName"><b>Заказчик:</b> <span>---</span></div>
+                <div id="dispPhone"><b>Контактный номер:</b> <span>---</span></div>
+                <div id="dispArrival"><b>Заезд:</b> <span>---</span></div>
+                <div id="dispAddr"><b>Адрес объекта:</b> <span>---</span></div>
+                <div id="dispSize"><b>Размер конструкции:</b> <span>---</span></div>
+            </div>
+
+            <div class="doc-meta">
+                <div>Номер: <span id="docNumber">КП-0000</span></div>
+                <div>Дата: <span id="docDate">00.00.0000</span></div>
+            </div>
+
+            <div class="table-header-print">
+                <span class="print-col-name">Наименование позиции</span>
+                <span class="print-col-qty">Кол-во</span>
+                <span class="print-col-price">Цена</span> 
+            </div>
+
+            <div id="printTableBody">
+                <div style="text-align:center; color:#999; padding:20px;">Позиции не выбраны</div>
+            </div>
+
+            <div id="extraPaymentBlock" style="margin-top: 20px; font-size: 14px; line-height: 1.6; color: #333; padding-left: 5px;">
+                <div class="price-line">Стоимость бытовки <span id="printGoodsTotal">0</span> руб.</div>
+                <div id="deliveryInfoPrint" style="display:none;" class="price-line">Доставка <span id="deliveryPrice"></span></div>
+                <div class="price-line">Итого: <span id="printFinalTotal">0</span> руб.</div>
+                
+                <div id="printRowNoNds" class="cashless-row-print">
+                    <span>ОПЛАТА ПО БЕЗНАЛУ БЕЗ НДС 13%:</span>
+                    <span id="printNoNds">0 руб.</span>
+                </div>
+                <div id="printRowWithNds" class="cashless-row-print">
+                    <span>ОПЛАТА ПО БЕЗНАЛУ С НДС +22%:</span>
+                    <span id="printWithNds">0 руб.</span>
+                </div>
+
+                <div id="cashPaymentDetailsBlock">
+                    <div style="margin-top: 12px;">Предоплата 5 000 руб.</div>
+                    <div>тел. +7 (985) 128-33-85</div>
+                    <div>Ольга К. Т-Банк</div>
+                    <div style="margin-top: 10px; font-weight: bold;">Сообщение о назначении платежа указывать не нужно!</div>
+                    <div style="margin-top: 10px;" class="price-line"><span id="printDriverCash">0</span> руб. оплата водителю НАЛИЧНЫМИ</div>
+                </div>
+            </div>
+
+            <div id="dispNote" class="print-note-box"></div>
+
+            <div id="layoutPreviewContainer">
+                <div style="font-weight:bold; margin-bottom:10px; font-size:14px; color:#2c3e50;">СХЕМА ПЛАНИРОВКИ:</div>
+                <img id="layoutImage" src="" alt="Планировка">
+            </div>
+
+            <div class="total-bar">
+                <span>ИТОГО К ОПЛАТЕ:</span>
+                <span><span id="totalDisplay" class="price-val">0</span> руб.</span>
+            </div>
+        </div>
+
+        <div class="action-buttons-group">
+            <button class="btn btn-client-order" onclick="openClientOrderModal()">Заявка для производства</button>
+            <button class="btn btn-copy-text" onclick="openClientTextModal()">Заявка для клиента</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="orderModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="modalTitle">Заявка для производства</h3>
+            <button class="modal-close" onclick="closeClientOrderModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBodyFields">
+            <div class="modal-inputs-grid" id="modalInputsGrid">
+                <div>
+                    <label>Дата:</label>
+                    <input type="text" id="modalDate" value="" oninput="updateModalTextContent()">
+                </div>
+                <div>
+                    <label>Аванс:</label>
+                    <input type="text" id="modalAdvance" value="5000" oninput="updateModalTextContent()">
+                </div>
+                <div>
+                    <label style="opacity: 0.6;">Заказчик:</label>
+                    <input type="text" id="modalClientName" value="" placeholder="ФИО заказчика" oninput="updateModalTextContent()" style="background: #fdfdfd; opacity: 0.85;">
+                </div>
+                <div>
+                    <label style="opacity: 0.6;">Телефон:</label>
+                    <input type="text" id="modalClientPhone" value="" placeholder="Контактный номер" oninput="updateModalTextContent()" style="background: #fdfdfd; opacity: 0.85;">
+                </div>
+                <div>
+                    <label style="opacity: 0.6;">Адрес:</label>
+                    <input type="text" id="modalClientAddr" value="" placeholder="Адрес объекта" oninput="updateModalTextContent()" style="background: #fdfdfd; opacity: 0.85;">
+                </div>
+            </div>
+            <textarea id="modalTextPreview" class="modal-text-preview"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-hide-prices" style="width: auto; padding: 8px 20px;" onclick="closeClientOrderModal()">Отмена</button>
+            <button class="btn btn-print" id="modalActionBtn" style="width: auto; padding: 8px 20px;" onclick="modalAction()">Заявка для производства</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function roundTo100(val) {
+    if (val === "" || val === null) return "";
+    return Math.round(parseFloat(val) / 100) * 100;
+}
+
+function formatPrice(val) {
+    if (val === 0 || val === "0" || !val) return "";
+    return val.toLocaleString() + ' руб.';
+}
+
+let hasShownArrivalAlert = false;
+let currentModalType = 'production';
+
+const interiorFinishData = {
+    "2x23": { "Оргалит": 59000, "ОСБ": 69000, "Вагонка С": 74000, "Без отделки и утепления": 53000 },
+    "3x23": { "Оргалит": 59000, "ОСБ": 69000, "Вагонка С": 74000, "Без отделки и утепления": 53000 },
+    "4x23": { "Оргалит": 69000, "ОСБ": 81000, "Вагонка С": 88000, "Без отделки и утепления": 67000 },
+    "5x23": { "Оргалит": 75000, "ОСБ": 91000, "Вагонка С": 94000, "Без отделки и утепления": 69500 },
+    "6x23": { "Оргалит": 81000, "ОСБ": 98000, "Вагонка С": 100000, "Без отделки и утепления": 76000 },
+    "7x23": { "Оргалит": 105000, "ОСБ": 123500, "Вагонка С": 127000, "Без отделки и утепления": 109000 },
+    "bk3": { "Оргалит": 93000, "ОСБ": 102000, "Вагонка С": 105500, "Без отделки и утепления": 85000 },
+    "bk4": { "Оргалит": 98000, "ОСБ": 109000, "Вагонка С": 112500, "Без отделки и утепления": 90500 },
+    "bk5": { "Оргалит": 104000, "ОСБ": 117000, "Вагонка С": 121000, "Без отделки и утепления": 97500 },
+    "bk585": { "Оргалит": 109000, "ОСБ": 124000, "Вагонка С": 128000, "Без отделки и утепления": 103000 },
+    "bk7": { "Оргалит": 138500, "ОСБ": 156000, "Вагонка С": 161000, "Без отделки и утепления": 131500 }
+};
+
+const insulationPrices = {
+    "2x23": 9000,
+    "3x23": 13000,
+    "4x23": 16000,
+    "5x23": 20000,
+    "6x23": 24000,
+    "7x23": 27000,
+    "bk3": 13000,
+    "bk4": 16000,
+    "bk5": 20000,
+    "bk585": 24000,
+    "bk7": 27000
+};
+
+const galvanizedProflistPrices = {
+    "2x23": 58000,
+    "3x23": 65000,
+    "4x23": 77000,
+    "5x23": 84000,
+    "6x23": 92000,
+    "7x23": 108000,
+    "bk3": 93000,
+    "bk4": 98000,
+    "bk5": 104000,
+    "bk585": 109000,
+    "bk7": 138500
+};
+
+const groupedExtraOptions = {
+    "Окна": { 
+        "Деревянное окно с одним стеклом, 60х80 см (дополнительно)": 4000,
+        "Деревянное окно с одним стеклом, 70х85 см  (дополнительно)": 3000,
+        "Окно ПВХ, 50x50 см (однокамерное, одна створка поворотно-откидная)": 7000, 
+        "Окно ПВХ, 60x90 см (однокамерное, одна створка поворотно-откидная)": 8000, 
+        "Окно ПВХ, 100x100 см (однокамерное, две створки глухие, поворотно-откидные)": 12000, 
+    },
+    "Двери и перегородки": { 
+        "Металлическая дверь с замком, 80х2000 см": 15000, 
+        "Деревянная дверь (дополнительно) 80 см": 5000, 
+        get "Перегородка (оргалит) без двери"() {
+            const sizeVal = document.getElementById('sizeSelect') ? document.getElementById('sizeSelect').value : '';
+            const height = (sizeVal && sizeVal.startsWith('bk')) ? '2.4 м' : '2.3 м';
+            return { name: `Перегородка (оргалит) без двери, ${height}`, price: 6000 };
+        },
+        "Перегородка (оргалит) с дверью": 7000,
+        get "Перегородка (осб) без двери"() {
+            const sizeVal = document.getElementById('sizeSelect') ? document.getElementById('sizeSelect').value : '';
+            const height = (sizeVal && sizeVal.startsWith('bk')) ? '2.4 м' : '2.3 м';
+            return { name: `Перегородка (осб) без двери, ${height}`, price: 7000 };
+        },
+        "Перегородка (осб) с дверью": 8000,
+        get "Перегородка (вагонка С) без двери"() {
+            const sizeVal = document.getElementById('sizeSelect') ? document.getElementById('sizeSelect').value : '';
+            const height = (sizeVal && sizeVal.startsWith('bk')) ? '2.4 м' : '2.3 м';
+            return { name: `Перегородка (вагонка С) без двери, ${height}`, price: 9000 };
+        },
+        "Перегородка (вагонка С) с дверью": 9000
+    },
+    "Другие опции": {
+        "Сборка": 24000, 
+        "Ступеньки из доски": 2000, 
+        "Обработка антисептиком нижних лаг": 4000, 
+        "Установка через забор": 5000,
+        "__custom__1": { isCustom: true, label: "Своя позиция 1:" },
+        "__custom__2": { isCustom: true, label: "Своя позиция 2:" },
+        "__custom__3": { isCustom: true, label: "Своя позиция 3:" }
+    }
+};
+
+const layoutImages = { "1": "https://drive.google.com/thumbnail?id=1Iy6zEfS4NvHhiTsBsVuP1heXQC5BhdRQ&sz=w1000", "2": "https://drive.google.com/thumbnail?id=1sIRmSdv2hWk2KE-cPSO3RgXKibtyUZKM&sz=w1000", "3": "https://drive.google.com/thumbnail?id=1AT12Av9B_F1Z26-PjGf51aykA603KR3h&sz=w1000", "4": "https://drive.google.com/thumbnail?id=1v_V_DQKzL1IRn7ILB7QjPV4d-wul8FZ-&sz=w1000", "5": "https://drive.google.com/thumbnail?id=13occ4A_1CnBe-9UEURIRrtdPOuvH26YZ&sz=w1000", "6": "https://drive.google.com/thumbnail?id=1BgZqWDIeHCXsrYEP0EGRRcfPVuCqAglI&sz=w1000", "7": "https://drive.google.com/thumbnail?id=1QYl18WOzbRjcz9z_-CHsEDF-zCD94Iqn&sz=w1000", "8": "https://drive.google.com/thumbnail?id=1FhCRuLq3xiPxG05iRVyl7K_YYoHMBp2V&sz=w1000", "9": "https://drive.google.com/thumbnail?id=1ntpVuBOcBNsEre-Lubrq2z0Y5arbCY-X&sz=w1000", "10": "https://drive.google.com/thumbnail?id=1siATd3ffHMNDtn4OIsQgB1EWVmMbnvhU&sz=w1000", "11": "https://drive.google.com/thumbnail?id=1gtnlaWN8NjWGaGb5TAnTNM8M45qjfnUt&sz=w1000", "12": "https://drive.google.com/thumbnail?id=1jScdYKhiDhDcUlPBj5Dk1S6hc7HGEPTs&sz=w1000", "13": "https://drive.google.com/thumbnail?id=1SnNzGR2QaADbBSkvz9eTstT3vF69V-hC&sz=w1000", "14": "https://drive.google.com/thumbnail?id=1BI7dfSAxa_KV02DuHnzrFjJlUNIGuUM1&sz=w1000", "15": "https://drive.google.com/thumbnail?id=1697CNkTYejveS1ijBnapXSsTYpzWmFcr&sz=w1000", "16": "https://drive.google.com/thumbnail?id=1BlHYy8Rd7ZnFwvkAcWsXQ7mN74jv-jT8&sz=w1000" };
+
+function initLayoutGrid() {
+    const grid = document.getElementById('layoutGrid');
+    const gridMore = document.getElementById('layoutGridMore');
+    grid.innerHTML = `<div class="layout-card active" onclick="selectLayout('none', this)">
+        <div class="layout-icon-placeholder">НЕТ</div>
+        <span>Без планировки</span>
+    </div>`;
+    gridMore.innerHTML = '';
+
+    let index = 0;
+    Object.entries(layoutImages).forEach(([id, url]) => {
+        const card = document.createElement('div');
+        card.className = 'layout-card';
+        card.onclick = function() { selectLayout(id, this); };
+        const thumbUrl = url.replace('sz=w1000', 'sz=w200');
+        card.innerHTML = `<img src="${thumbUrl}" alt="План ${id}"><span>Планировка №${id}</span>`;
+        
+        if (index < 3) {
+            grid.appendChild(card);
+        } else {
+            gridMore.appendChild(card);
+        }
+        index++;
+    });
+}
+
+function toggleSection(contentId, btn) {
+    const content = document.getElementById(contentId);
+    content.classList.toggle('expanded');
+    if (content.classList.contains('expanded')) {
+        btn.innerText = "Скрыть варианты";
+    } else {
+        btn.innerText = "Показать остальные варианты";
+    }
+}
+
+function selectLayout(id, element) {
+    document.querySelectorAll('.layout-card').forEach(c => c.classList.remove('active'));
+    element.classList.add('active');
+    const container = document.getElementById('layoutPreviewContainer');
+    const img = document.getElementById('layoutImage');
+    if (id === 'none') { container.style.display = 'none'; img.src = ""; } 
+    else { container.style.display = 'block'; img.src = layoutImages[id]; }
+}
+
+function toggleRaspashonka() {
+    const isChecked = document.getElementById('raspashonkaCheck').checked;
+    const card = document.getElementById('raspashonkaCard');
+    if (isChecked) {
+        card.style.background = '#e8f5e9';
+        card.style.borderColor = 'var(--accent)';
+    } else {
+        card.style.background = '#fff';
+        card.style.borderColor = '#eee';
+    }
+    calculate();
+}
+
+window.onload = function() { 
+    initLayoutGrid(); 
+    handleSizeChange(); 
+    const todayStr = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('modalDate').value = todayStr;
+};
+
+function togglePrices() {
+    const body = document.body;
+    const btn = document.getElementById('hidePricesBtn');
+    body.classList.toggle('hide-prices-active');
+    btn.innerText = body.classList.contains('hide-prices-active') ? "Показать цены" : "Скрыть цены";
+}
+
+function handleSizeChange() {
+    updateOuterFinishOptions();
+    updateFinishOptions();
+    syncOuterAndInteriorWithSelection();
+    renderExtras();
+    calculate();
+}
+
+function syncClient() {
+    const arrivalVal = document.getElementById('clientArrivalInput').value;
+    if (arrivalVal.length > 0 && !hasShownArrivalAlert) {
+        alert("Предупреди клиента об оплате трактора в случае застревания на участке");
+        hasShownArrivalAlert = true;
+    }
+    const nameVal = document.getElementById('clientNameInput').value;
+    const phoneVal = document.getElementById('clientPhoneInput').value;
+    const addrVal = document.getElementById('clientAddrInput').value;
+
+    document.querySelector('#dispName span').innerText = nameVal || '---';
+    document.querySelector('#dispPhone span').innerText = phoneVal || '---';
+    document.querySelector('#dispArrival span').innerText = arrivalVal || '---';
+    document.querySelector('#dispAddr span').innerText = addrVal || '---';
+
+    if (currentModalType === 'production') {
+        document.getElementById('modalClientName').value = nameVal || '';
+        document.getElementById('modalClientPhone').value = phoneVal || '';
+        document.getElementById('modalClientAddr').value = addrVal || '';
+    }
+    updateModalTextContent();
+}
+
+function syncNote() {
+    const noteVal = document.getElementById('noteInput').value;
+    const dispNote = document.getElementById('dispNote');
+    if (noteVal.trim() !== "") {
+        dispNote.innerText = "Примечание:\n" + noteVal;
+        dispNote.style.display = 'block';
+    } else { dispNote.style.display = 'none'; }
+}
+
+function updateOuterFinishOptions() {
+    const size = document.getElementById('sizeSelect').value;
+    const container = document.getElementById('outerFinishListSettings');
+    container.innerHTML = '';
+
+    if (!size) {
+        container.innerHTML = '<small style="color:gray">Сначала выберите размер в п.1</small>';
+        return;
+    }
+
+    const isBK = size.startsWith('bk');
+    const orgalitPrice = (interiorFinishData[size] && interiorFinishData[size]["Оргалит"]) || 0;
+    const galvBasePrice = galvanizedProflistPrices[size] || 0;
+    const addonStep = isBK ? 7000 : 6000;
+
+    let items = [];
+    if (!isBK) {
+        items = [
+            { name: "Вагонка С (укладка в пазы)", price: orgalitPrice, checked: true, isColored: false },
+            { name: "Профлист оцинкованный", price: galvBasePrice, checked: false, isColored: false },
+            { name: "Профлист цветной", price: galvBasePrice + addonStep, checked: false, isColored: true }
+        ];
+    } else {
+        items = [
+            { name: "Профлист оцинкованный", price: orgalitPrice, checked: true, isColored: false },
+            { name: "Профлист цветной", price: galvBasePrice + addonStep, checked: false, isColored: true },
+            { name: "Имитация БК снаружи полностью", price: 16000, checked: false, isColored: false },
+            { name: "Имитация БК снаружи лицевая", price: 11000, checked: false, isColored: false }
+        ];
+    }
+
+    let html = '';
+    items.forEach(item => {
+        const checkedAttr = item.checked ? 'checked' : '';
+        const extraClass = item.isColored ? ' colored-proflist-box' : '';
+        
+        let colorBlockHtml = '';
+        if (item.isColored) {
+            colorBlockHtml = `
+            <div id="proflistColorSelectWrapper" style="margin-top: 6px; display: none; padding: 8px; background: #fffdf0; border: 1px solid #f0e68c; border-radius: 4px;">
+                <label style="font-size: 11px; color: #666; display: block; margin-bottom: 2px;">Выберите цвет профлиста:</label>
+                <select id="proflistColorSelect" onchange="handleColorSelectChange()">
+                    <option value="Графит" selected>Графит</option>
+                    <option value="Светло-серый">Светло-серый</option>
+                    <option value="Коричневый">Коричневый</option>
+                    <option value="Зеленый">Зеленый</option>
+                    <option value="Бежевый">Бежевый</option>
+                    <option value="Синий">Синий</option>
+                    <option value="Свой вариант">Свой вариант</option>
+                </select>
+                <div id="customColorInputWrapper" style="margin-top: 6px; display: none;">
+                    <input type="text" id="customColorInput" placeholder="Впишите нужный цвет..." oninput="calculate()">
+                </div>
+            </div>`;
+        }
+
+        html += `<div class="item outer-finish-item" data-outer-name="${item.name}">
+            <div class="item-row">
+                <label style="flex:2;"><input type="checkbox" class="price-check outer-finish-box${extraClass}" data-name="${item.name}" ${checkedAttr} onchange="handleOuterFinishSelect(this)"> ${item.name}</label>
+                <input type="number" class="qty-input no-print" value="1" min="1" oninput="calculate()">
+                <input type="number" class="price-input-manual no-print" value="${item.price}" readonly>
+                <input type="number" class="price-input-override no-print" value="" placeholder="своя" oninput="calculate()">
+            </div>
+            ${colorBlockHtml}
+        </div>`;
+    });
+
+    container.innerHTML = html;
+}
+
+function handleColorSelectChange() {
+    const val = document.getElementById('proflistColorSelect').value;
+    const customWrapper = document.getElementById('customColorInputWrapper');
+    customWrapper.style.display = (val === 'Свой вариант') ? 'block' : 'none';
+    calculate();
+}
+
+function handleOuterFinishSelect(el) {
+    if (el.checked) {
+        document.querySelectorAll('.outer-finish-box').forEach(box => { 
+            if (box !== el) box.checked = false; 
+        });
+    }
+    const coloredBox = document.querySelector('.colored-proflist-box');
+    const colorWrapper = document.getElementById('proflistColorSelectWrapper');
+    if (colorWrapper) {
+        colorWrapper.style.display = (coloredBox && coloredBox.checked) ? 'block' : 'none';
+    }
+    syncOuterAndInteriorWithSelection();
+    calculate();
+}
+
+function updateFinishOptions() {
+    const size = document.getElementById('sizeSelect').value;
+    const container = document.getElementById('finishListSettings');
+    const sizeSelect = document.getElementById('sizeSelect');
+    document.querySelector('#dispSize span').innerText = size && sizeSelect.selectedIndex >= 0 ? sizeSelect.options[sizeSelect.selectedIndex].text : '---';
+    container.innerHTML = '';
+    if (size && interiorFinishData[size]) {
+        let entries = Object.entries(interiorFinishData[size]);
+        let mainHtml = '';
+        let moreHtml = '';
+
+        entries.forEach(([name, price], index) => {
+            const checkedAttr = (index === 0) ? 'checked' : '';
+            let itemHtml = `<div class="item finish-item-container" data-finish-name="${name}">
+                <div class="item-row">
+                    <label style="flex:2;"><input type="checkbox" class="price-check finish-box" data-name="${name}" ${checkedAttr} onchange="handleFinishSelect(this)"> ${name}</label>
+                    <input type="number" class="qty-input no-print" value="1" min="1" oninput="calculate()">
+                    <input type="number" class="price-input-manual no-print" value="${price}" readonly>
+                    <input type="number" class="price-input-override no-print" value="" placeholder="своя" oninput="calculate()">
+                </div>
+            </div>`;
+            
+            if (index < 3) {
+                mainHtml += itemHtml;
+            } else {
+                moreHtml += itemHtml;
+            }
+        });
+
+        const insPrice = insulationPrices[size] || 0;
+        let insulationHtml = `<div class="category-header" style="margin-top: 10px; font-size: 13px;">Утепление</div>`;
+        insulationHtml += `<div class="item">
+            <div class="item-row">
+                <label style="flex:2;"><input type="checkbox" class="price-check insulation-box" data-name="Утепление 100 мм (минвата)" onchange="calculate()"> Утепление 100 мм (минвата)</label>
+                <input type="number" class="qty-input no-print" value="1" min="1" oninput="calculate()">
+                <input type="number" class="price-input-manual no-print" value="${insPrice}" readonly>
+                <input type="number" class="price-input-override no-print" value="" placeholder="своя" oninput="calculate()">
+            </div>
+        </div>`;
+
+        container.innerHTML = mainHtml;
+        if (moreHtml !== '') {
+            container.innerHTML += `<div id="finishExpandable" class="expandable-content">${moreHtml}</div>`;
+            container.innerHTML += `<button type="button" class="btn-show-more" onclick="toggleSection('finishExpandable', this)">Показать остальные варианты</button>`;
+        }
+        container.innerHTML += insulationHtml;
+
+    } else {
+        container.innerHTML = '<small style="color:gray">Сначала выберите размер в п.1</small>';
+    }
+}
+
+function handleFinishSelect(el) {
+    if (el.checked) {
+        document.querySelectorAll('.finish-box').forEach(box => { if (box !== el) box.checked = false; });
+    }
+    calculate();
+}
+
+function syncOuterAndInteriorWithSelection() {
+    const size = document.getElementById('sizeSelect').value;
+    if (!size || !interiorFinishData[size]) return;
+
+    const isBK = size.startsWith('bk');
+    const outerFinishObj = document.querySelector('.outer-finish-box:checked');
+    const outerName = outerFinishObj ? outerFinishObj.getAttribute('data-name') : '';
+
+    const orgalitPrice = interiorFinishData[size]["Оргалит"] || 0;
+    const galvBasePrice = galvanizedProflistPrices[size] || 0;
+    const addonStep = isBK ? 7000 : 6000;
+
+    const isOrgalitTransferred = (!isBK && (outerName === "Вагонка С (укладка в пазы)" || outerName === "Профлист оцинкованный" || outerName === "Профлист цветной")) ||
+                                 (isBK && (outerName === "Профлист оцинкованный" || outerName === "Профлист цветной"));
+
+    document.querySelectorAll('.outer-finish-item').forEach(itemDiv => {
+        const name = itemDiv.getAttribute('data-outer-name');
+        const manualInput = itemDiv.querySelector('.price-input-manual');
+        if (!manualInput) return;
+
+        if (!isBK) {
+            if (name === "Вагонка С (укладка в пазы)") {
+                manualInput.value = orgalitPrice;
+            } else if (name === "Профлист оцинкованный") {
+                manualInput.value = galvBasePrice;
+            } else if (name === "Профлист цветной") {
+                manualInput.value = galvBasePrice + addonStep;
+            }
+        } else {
+            if (name === "Профлист оцинкованный") {
+                manualInput.value = orgalitPrice;
+            } else if (name === "Профлист цветной") {
+                manualInput.value = galvBasePrice + addonStep;
+            } else if (name === "Имитация БК снаружи полностью") {
+                manualInput.value = 16000;
+            } else if (name === "Имитация БК снаружи лицевая") {
+                manualInput.value = 11000;
+            }
+        }
+    });
+
+    const finishContainers = document.querySelectorAll('.finish-item-container');
+    finishContainers.forEach(itemDiv => {
+        const name = itemDiv.getAttribute('data-finish-name');
+        const cb = itemDiv.querySelector('.finish-box');
+        const qtyInput = itemDiv.querySelector('.qty-input');
+        const manualInput = itemDiv.querySelector('.price-input-manual');
+        const overrideInput = itemDiv.querySelector('.price-input-override');
+        const fullPrice = interiorFinishData[size][name] || 0;
+
+        if (name === "Оргалит") {
+            if (isOrgalitTransferred) {
+                cb.checked = true;
+                cb.disabled = true;
+                qtyInput.disabled = true;
+                manualInput.disabled = true;
+                overrideInput.disabled = true;
+                manualInput.value = 0;
+                itemDiv.style.opacity = '0.5';
+            } else {
+                cb.disabled = false;
+                qtyInput.disabled = false;
+                manualInput.disabled = false;
+                overrideInput.disabled = false;
+                manualInput.value = fullPrice;
+                itemDiv.style.opacity = '1';
+            }
+        } else {
+            cb.disabled = false;
+            qtyInput.disabled = false;
+            manualInput.disabled = false;
+            overrideInput.disabled = false;
+            manualInput.value = isOrgalitTransferred ? (fullPrice - orgalitPrice) : fullPrice;
+            itemDiv.style.opacity = '1';
+        }
+    });
+
+    if (isOrgalitTransferred) {
+        document.querySelectorAll('.finish-box').forEach(box => {
+            if (box.getAttribute('data-name') !== "Оргалит") {
+                box.checked = false;
+            }
+        });
+        const orgalitCb = document.querySelector('.finish-box[data-name="Оргалит"]');
+        if (orgalitCb) orgalitCb.checked = true;
+    } else {
+        const anyChecked = document.querySelector('.finish-box:checked');
+        if (!anyChecked) {
+            const orgalitCb = document.querySelector('.finish-box[data-name="Оргалит"]');
+            if (orgalitCb) orgalitCb.checked = true;
+        }
+    }
+}
+
+function renderExtras() {
+    const container = document.getElementById('extraListSettings');
+    const size = document.getElementById('sizeSelect').value;
+
+    if (!size) {
+        container.innerHTML = '<small style="color:orange">Выберите отделку в п.4</small>';
+        return;
+    }
+
+    container.innerHTML = `<div class="col-header-settings">
+                    <span style="width:45px; text-align:center">Кол-во</span>
+                    <span style="width:80px; text-align:center">Цена</span>
+                    <span style="width:80px; text-align:center">Своя цена</span>
+                </div>`;
+                
+    let groupIndex = 0;
+    Object.entries(groupedExtraOptions).forEach(([groupName, options]) => {
+        groupIndex++;
+        container.innerHTML += `<div class="category-header">${groupName}</div>`;
+        
+        let optionEntries = Object.entries(options);
+        let mainHtml = '';
+        let moreHtml = '';
+
+        optionEntries.forEach(([key, val], index) => {
+            let itemHtml = '';
+            let name = key;
+            if (val && typeof val === 'object' && 'name' in val) {
+                name = val.name;
+            }
+            if (typeof val === 'object' && val !== null && val.isCustom) {
+                itemHtml = `<div class="item">
+                    <div class="item-row" style="flex-direction: column; align-items: stretch; gap: 5px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="flex:2; display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" class="price-check custom-pos-check" data-name-input="customName_${key}" onchange="calculate()">
+                                <span style="font-weight: bold; font-size: 13px; color: var(--primary);">${val.label}</span>
+                            </label>
+                            <input type="number" class="qty-input no-print" value="1" min="1" oninput="calculate()" style="width: 45px;">
+                            <input type="number" class="price-input-override no-print custom-price-input" value="" placeholder="цена" oninput="calculate()" style="width: 80px;">
+                        </div>
+                        <input type="text" id="customName_${key}" class="no-print" placeholder="Введите название своей позиции..." oninput="calculate()" style="margin-top: 2px; font-size: 13px;">
+                    </div>
+                </div>`;
+            } else {
+                let price = typeof val === 'object' && val !== null && 'price' in val ? val.price : (typeof val === 'number' ? val : 0);
+                let condition = typeof val === 'object' && val !== null && 'condition' in val ? val.condition : null;
+                
+                let isDisabled = false;
+                if (condition && !condition(size)) {
+                    isDisabled = true;
+                }
+
+                itemHtml = `<div class="item" ${isDisabled ? 'style="opacity: 0.5;"' : ''}>
+                    <div class="item-row">
+                        <label style="flex:2;"><input type="checkbox" class="price-check extra-option-check" data-name="${name}" ${isDisabled ? 'disabled' : ''} onchange="calculate()"> ${name}</label>
+                        <input type="number" class="qty-input no-print" value="1" min="1" ${isDisabled ? 'disabled' : ''} oninput="calculate()">
+                        <input type="number" class="price-input-manual no-print" value="${price}" ${isDisabled ? 'disabled' : ''} readonly>
+                        <input type="number" class="price-input-override no-print" value="" placeholder="своя" ${isDisabled ? 'disabled' : ''} oninput="calculate()">
+                    </div>
+                </div>`;
+            }
+
+            if (index < 3) {
+                mainHtml += itemHtml;
+            } else {
+                moreHtml += itemHtml;
+            }
+        });
+
+        container.innerHTML += mainHtml;
+        if (moreHtml !== '') {
+            const expandableId = `extraExpandable_${groupIndex}`;
+            container.innerHTML += `<div id="${expandableId}" class="expandable-content">${moreHtml}</div>`;
+            container.innerHTML += `<button type="button" class="btn-show-more" onclick="toggleSection('${expandableId}', this)">Показать остальные варианты</button>`;
+        }
+    });
+}
+
+function getSelectedPricingData() {
+    const sizeSelect = document.getElementById('sizeSelect');
+    const sizeVal = sizeSelect ? sizeSelect.value : '';
+    const isBK = sizeVal.startsWith('bk');
+
+    const outerFinishObj = document.querySelector('.outer-finish-box:checked');
+    let outerFinishPrice = 0;
+    let outerFinishName = "";
+    let isColoredProflist = false;
+    let selectedColorText = "";
+
+    if (outerFinishObj) {
+        outerFinishName = outerFinishObj.getAttribute('data-name');
+        const itemRow = outerFinishObj.closest('.item-row');
+        const qty = parseInt(itemRow.querySelector('.qty-input').value) || 1;
+        const manualP = parseInt(itemRow.querySelector('.price-input-manual').value) || 0;
+        const overridePVal = itemRow.querySelector('.price-input-override').value;
+        outerFinishPrice = (overridePVal !== "" ? roundTo100(overridePVal) : manualP) * qty;
+
+        if (outerFinishName === "Профлист цветной") {
+            isColoredProflist = true;
+            const colorSelect = document.getElementById('proflistColorSelect');
+            if (colorSelect) {
+                const selVal = colorSelect.value;
+                if (selVal === 'Свой вариант') {
+                    const customInput = document.getElementById('customColorInput');
+                    const customVal = customInput ? customInput.value.trim() : "";
+                    selectedColorText = customVal !== "" ? customVal : "свой цвет";
+                } else {
+                    selectedColorText = selVal.toLowerCase();
+                }
+            }
+        }
+    }
+
+    const isOrgalitTransferred = (!isBK && (outerFinishName === "Вагонка С (укладка в пазы)" || outerFinishName === "Профлист оцинкованный" || outerFinishName === "Профлист цветной")) ||
+                                 (isBK && (outerFinishName === "Профлист оцинкованный" || outerFinishName === "Профлист цветной"));
+
+    const finishObj = document.querySelector('.finish-box:checked');
+    let finishPrice = 0;
+    let finishName = "";
+
+    if (finishObj) {
+        finishName = finishObj.getAttribute('data-name');
+        const itemRow = finishObj.closest('.item-row');
+        const finishQty = parseInt(itemRow.querySelector('.qty-input').value) || 1;
+        const manualP = parseInt(itemRow.querySelector('.price-input-manual').value) || 0;
+        const overridePVal = itemRow.querySelector('.price-input-override').value;
+        finishPrice = (overridePVal !== "" ? roundTo100(overridePVal) : manualP) * finishQty;
+    } else if (isOrgalitTransferred) {
+        finishName = "Оргалит";
+        finishPrice = 0;
+    }
+
+    return {
+        isBK,
+        outerFinishObj,
+        outerFinishName,
+        outerFinishPrice,
+        isOrgalitTransferred,
+        isColoredProflist,
+        selectedColorText,
+        finishObj,
+        finishName,
+        finishPrice
+    };
+}
+
+function calculate() {
+    const sizeSelect = document.getElementById('sizeSelect');
+    if (!sizeSelect || !sizeSelect.options[sizeSelect.selectedIndex]) return;
+
+    const sizeVal = sizeSelect.value;
+    const sizeText = sizeSelect.options[sizeSelect.selectedIndex].text;
+    const isRaspashonka = document.getElementById('raspashonkaCheck').checked;
+    
+    const deliveryEnabled = document.getElementById('deliveryEnable').checked;
+    document.getElementById('deliveryInputs').style.display = deliveryEnabled ? 'block' : 'none';
+
+    const pData = getSelectedPricingData();
+    const {
+        isBK,
+        outerFinishObj,
+        outerFinishName,
+        outerFinishPrice,
+        isOrgalitTransferred,
+        isColoredProflist,
+        selectedColorText,
+        finishObj,
+        finishName,
+        finishPrice
+    } = pData;
+
+    const insulationObj = document.querySelector('.insulation-box:checked');
+    let insulationPrice = 0;
+
+    if (insulationObj) {
+        const itemRow = insulationObj.closest('.item-row');
+        const insulationQty = parseInt(itemRow.querySelector('.qty-input').value) || 1;
+        const manualP = parseInt(itemRow.querySelector('.price-input-manual').value) || 0;
+        const overridePVal = itemRow.querySelector('.price-input-override').value;
+        insulationPrice = (overridePVal !== "" ? roundTo100(overridePVal) : manualP) * insulationQty;
+    }
+
+    let goodsTotal = outerFinishPrice + finishPrice + insulationPrice;
+
+    let hasPartitions = false;
+    document.querySelectorAll('.extra-option-check:checked').forEach(cb => {
+        let name = cb.getAttribute('data-name');
+        if (name && name.toLowerCase().includes('перегородка')) {
+            hasPartitions = true;
+        }
+    });
+
+    document.querySelectorAll('.price-check:checked:not(.finish-box):not(.insulation-box):not(.outer-finish-box)').forEach(cb => {
+        const item = cb.closest('.item');
+        const qty = parseInt(item.querySelector('.qty-input').value) || 1;
+        if (cb.classList.contains('custom-pos-check')) {
+            const overridePriceVal = item.querySelector('.custom-price-input').value;
+            const price = (overridePriceVal !== "" ? roundTo100(overridePriceVal) : 0) * qty;
+            goodsTotal += price;
+        } else {
+            const name = cb.getAttribute('data-name');
+            const manualPrice = parseInt(item.querySelector('.price-input-manual').value) || 0;
+            const overridePriceVal = item.querySelector('.price-input-override').value;
+            let price = (overridePriceVal !== "" ? roundTo100(overridePriceVal) : manualPrice) * qty;
+            
+            if (name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                price = 4000;
+            }
+            goodsTotal += price;
+        }
+    });
+
+    let selectedMetalDoor = null;
+    let selectedWindows = [];
+
+    document.querySelectorAll('.price-check:checked:not(.finish-box):not(.insulation-box):not(.outer-finish-box)').forEach(cb => {
+        if (!cb.classList.contains('custom-pos-check')) {
+            let name = cb.getAttribute('data-name');
+            const itemRow = cb.closest('.item-row');
+            const qty = parseInt(itemRow.querySelector('.qty-input').value) || 1;
+            const manualPrice = parseInt(itemRow.querySelector('.price-input-manual').value) || 0;
+            const overrideVal = itemRow.querySelector('.price-input-override').value;
+            let price = (overrideVal !== "" ? roundTo100(overrideVal) : manualPrice) * qty;
+
+            if (name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                price = 4000;
+            }
+
+            if (name && name.toLowerCase().includes('окно')) {
+                selectedWindows.push({ name: name, qty: qty, price: price });
+            }
+            if (name && name.toLowerCase().includes('металлическая дверь')) {
+                selectedMetalDoor = { name: name, qty: qty, price: price };
+            }
+        }
+    });
+
+    const printTable = document.getElementById('printTableBody');
+    let html = "";
+
+    if (!sizeVal || (!finishObj && !outerFinishObj && !isOrgalitTransferred)) {
+        printTable.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">Позиции не выбраны</div>';
+    } else {
+        const allExtras = Array.from(document.querySelectorAll('.price-check:checked:not(.finish-box):not(.insulation-box):not(.outer-finish-box)'));
+
+        if (isBK) {
+            html += `<div class="category-header">Новый блок-контейнер ${sizeText}</div>`;
+            html += `<div class="print-row"><span class="print-col-name">Каркас: швеллер гнутый 100х50</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            
+            let outerPrintName = isColoredProflist
+                ? `Профлист (${selectedColorText})`
+                : (outerFinishName && outerFinishName !== "Профлист оцинкованный" ? outerFinishName : "Профлист (цвет оцинковка/серый каркас)");
+
+            html += `<div class="print-row"><span class="print-col-name">Внешняя отделка: ${outerPrintName}</span><span class="print-col-qty"></span><span class="print-col-price">${formatPrice(outerFinishPrice)}</span></div>`;
+            html += `<div class="print-row finish-row-item"><span class="print-col-name">Внутренняя отделка: ${finishName}</span><span class="print-col-qty"></span><span class="print-col-price">${formatPrice(finishPrice)}</span></div>`;
+            
+            if (insulationObj) {
+                html += `<div class="print-row"><span class="print-col-name">Утепление: 100 мм (минвата)</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            } else if (finishName !== "Без отделки и утепления") {
+                html += `<div class="print-row"><span class="print-col-name">Утепление: 50 мм (пол, потолок, стены)</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            }
+
+            html += `<div class="print-row"><span class="print-col-name">Кровля: односкатная (профлист оцинкованный)</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            html += `<div class="print-row"><span class="print-col-name">Пол: доска обрезная 100х25 мм + ОСБ</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            
+            if (selectedWindows.length > 0) {
+                selectedWindows.forEach(w => {
+                    let displayName = w.name;
+                    let displayQty = w.qty + " шт.";
+                    if (w.name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                        displayName = "деревянное 60х80 см с одним стеклом, открывающееся";
+                        displayQty = "2 шт.";
+                    }
+                    html += `<div class="print-row"><span class="print-col-name">Окно: ${displayName}</span><span class="print-col-qty">${displayQty}</span><span class="print-col-price">${formatPrice(w.price)}</span></div>`;
+                });
+            } else {
+                html += `<div class="print-row"><span class="print-col-name">Окно: деревянное 70×80 см, двойное остекление</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            }
+
+            if (selectedMetalDoor) {
+                html += `<div class="print-row"><span class="print-col-name">Дверь: ${selectedMetalDoor.name}</span><span class="print-col-qty">${selectedMetalDoor.qty} шт.</span><span class="print-col-price">${formatPrice(selectedMetalDoor.price)}</span></div>`;
+            } else {
+                html += `<div class="print-row"><span class="print-col-name">Дверь: деревянная каркасная 1,80×80</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            }
+
+            html += `<div class="print-row"><span class="print-col-name">Пол черновой: сплошной</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            html += `<div class="print-row"><span class="print-col-name">Пароизоляция: да</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+        } else {
+            if (isRaspashonka) {
+                if (hasPartitions) {
+                    html += `<div class="category-header">Новая бытовка ${sizeText} (по крыше)<br>Тип: распашонка с перегородками</div>`;
+                } else {
+                    html += `<div class="category-header">Новая бытовка ${sizeText} (по крыше)<br>Тип: распашонка без перегородок</div>`;
+                }
+            } else {
+                html += `<div class="category-header">Новая бытовка ${sizeText} (по крыше)</div>`;
+            }
+
+            const frameText = insulationObj ? "Каркас: 100х50" : "Каркас: 50х50";
+            html += `<div class="print-row"><span class="print-col-name">${frameText}</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            
+            let outerPrintName = "Вагонка С (не обработана антисептиком)";
+            if (isColoredProflist) {
+                outerPrintName = `Профлист (${selectedColorText})`;
+            } else if (outerFinishName && outerFinishName !== "Вагонка С") {
+                outerPrintName = outerFinishName;
+            }
+
+            html += `<div class="print-row"><span class="print-col-name">Внешняя отделка: ${outerPrintName}</span><span class="print-col-qty"></span><span class="print-col-price">${formatPrice(outerFinishPrice)}</span></div>`;
+            html += `<div class="print-row finish-row-item"><span class="print-col-name">Внутренняя отделка: ${finishName}</span><span class="print-col-qty"></span><span class="print-col-price">${formatPrice(finishPrice)}</span></div>`;
+            html += `<div class="print-row"><span class="print-col-name">Кровля: Односкатная (профлист оцинкованный 0,35)</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            html += `<div class="print-row"><span class="print-col-name">Высота 2.1-1.9</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            
+            if (insulationObj) {
+                html += `<div class="print-row"><span class="print-col-name">Утепление: 100 мм (минвата)</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            } else if (finishName !== "Без отделки и утепления") {
+                html += `<div class="print-row"><span class="print-col-name">Утепление: 50 мм (пол, потолок, стены)</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            }
+            
+            if (selectedWindows.length > 0) {
+                selectedWindows.forEach(w => {
+                    let displayName = w.name;
+                    let displayQty = w.qty + " шт.";
+                    if (w.name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                        displayName = "деревянное 60х80 см с одним стеклом, открывающееся";
+                        displayQty = "2 шт.";
+                    }
+                    html += `<div class="print-row"><span class="print-col-name">Окно: ${displayName}</span><span class="print-col-qty">${displayQty}</span><span class="print-col-price">${formatPrice(w.price)}</span></div>`;
+                });
+            } else {
+                html += `<div class="print-row"><span class="print-col-name">Окно: деревянное 60х80 см с одним стеклом, открывающееся</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            }
+            
+            html += `<div class="print-row"><span class="print-col-name">Пол:  доска обрезная 100х25 мм + ОСБ</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            
+            if (selectedMetalDoor) {
+                html += `<div class="print-row"><span class="print-col-name">Дверь: ${selectedMetalDoor.name}</span><span class="print-col-qty">${selectedMetalDoor.qty} шт.</span><span class="print-col-price">${formatPrice(selectedMetalDoor.price)}</span></div>`;
+            } else {
+                html += `<div class="print-row"><span class="print-col-name">Дверь: каркасная деревянная 1,8х0,8 м</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            }
+            
+            html += `<div class="print-row"><span class="print-col-name">Черновой пол: доска с расстоянием 15-25 см</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            html += `<div class="print-row"><span class="print-col-name">Лыжи 100*100</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+            html += `<div class="print-row"><span class="print-col-name">Пароизоляция: пол</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+        }
+
+        allExtras.forEach(cb => {
+            const item = cb.closest('.item');
+            if (cb.classList.contains('custom-pos-check')) {
+                const nameInputId = cb.getAttribute('data-name-input');
+                let customName = document.getElementById(nameInputId).value.trim();
+                if (!customName) customName = "Своя позиция";
+                const up = item.querySelector('.custom-price-input').value !== "" ? roundTo100(item.querySelector('.custom-price-input').value) : 0;
+                const qty = parseInt(item.querySelector('.qty-input').value) || 1;
+                const displayPrice = (up * qty) === 0 ? "" : formatPrice(up * qty);
+                html += `<div class="print-row">
+                    <span class="print-col-name">${customName}</span>
+                    <span class="print-col-qty">${qty} шт.</span>
+                    <span class="print-col-price">${displayPrice}</span>
+                </div>`;
+            } else {
+                let name = cb.getAttribute('data-name');
+                if (name && (name.toLowerCase().includes('окно') || name.toLowerCase().includes('металлическая дверь'))) {
+                    return;
+                }
+
+                if (name.includes('без двери')) {
+                    const height = isBK ? '2.4 м' : '2.3 м';
+                    name = name.replace(/2\.3-2\.4 м/, height);
+                }
+                const itemRow = item.querySelector('.item-row');
+                const up = itemRow.querySelector('.price-input-override').value !== "" ? roundTo100(itemRow.querySelector('.price-input-override').value) : parseInt(itemRow.querySelector('.price-input-manual').value) || 0;
+                const qty = parseInt(itemRow.querySelector('.qty-input').value) || 1;
+
+                const displayPrice = (up * qty) === 0 ? "" : formatPrice(up * qty);
+                html += `<div class="print-row">
+                    <span class="print-col-name">${name}</span>
+                    <span class="print-col-qty">${qty} шт.</span>
+                    <span class="print-col-price">${displayPrice}</span>
+                </div>`;
+            }
+        });
+
+        html += `<div style="margin-top: 15px; font-size: 14px; font-weight: bold; color: var(--primary);">В комплекте:</div>`;
+        html += `<div class="print-row"><span class="print-col-name">Блоки (для установки бытовки)</span><span class="print-col-qty"></span><span class="print-col-price"></span></div>`;
+
+        printTable.innerHTML = html;
+    }
+    
+    let finalDeliveryCost = 0;
+    const deliveryManualInput = document.getElementById('deliveryPriceManual');
+    const deliveryInfoPrint = document.getElementById('deliveryInfoPrint');
+
+    if (deliveryEnabled) {
+        deliveryInfoPrint.style.display = 'block';
+        const km = parseFloat(document.getElementById('distance').value) || 0;
+        let dCostPerCar = km <= 60 ? 13000 : 13000 + (km - 60) * 150;
+        dCostPerCar = Math.ceil(dCostPerCar / 500) * 500;
+        
+        if(window.event && (['distance', 'deliveryEnable', 'deliveryQty'].includes(window.event.target.id))) {
+            deliveryManualInput.value = dCostPerCar * (parseInt(document.getElementById('deliveryQty').value) || 1);
+        }
+        finalDeliveryCost = parseInt(deliveryManualInput.value) || 0;
+        document.getElementById('deliveryPrice').innerText = formatPrice(finalDeliveryCost);
+    } else { 
+        deliveryInfoPrint.style.display = 'none';
+        deliveryManualInput.value = 0; 
+        document.getElementById('deliveryPrice').innerText = ""; 
+    }
+
+    const finalTotal = goodsTotal + finalDeliveryCost;
+    
+    document.getElementById('printGoodsTotal').innerText = goodsTotal.toLocaleString() + ' руб.';
+    document.getElementById('printFinalTotal').innerText = finalTotal.toLocaleString();
+    
+    const advanceInputElem = document.getElementById('modalAdvance');
+    const advanceNumeric = advanceInputElem ? (parseFloat(advanceInputElem.value.replace(/\s+/g, '')) || 0) : 5000;
+    const driverCashVal = finalTotal - advanceNumeric;
+    
+    const driverCashElement = document.getElementById('printDriverCash');
+    if(driverCashElement) {
+        driverCashElement.innerText = driverCashVal.toLocaleString();
+    }
+    
+    const noNds = Math.round(finalTotal * 1.13), withNds = Math.round(finalTotal * 1.22);
+    document.getElementById('sideNoNds').innerText = noNds.toLocaleString(); 
+    document.getElementById('sideWithNds').innerText = withNds.toLocaleString();
+    
+    const isNoNdsChecked = document.getElementById('checkNoNds').checked;
+    const isWithNdsChecked = document.getElementById('checkWithNds').checked;
+
+    let displaySum = finalTotal;
+    if (isNoNdsChecked) {
+        displaySum = noNds;
+    } else if (isWithNdsChecked) {
+        displaySum = withNds;
+    }
+
+    document.getElementById('sideTotalVal').innerText = displaySum.toLocaleString();
+    document.getElementById('totalDisplay').innerText = displaySum.toLocaleString();
+
+    document.getElementById('printRowNoNds').style.display = isNoNdsChecked ? 'flex' : 'none';
+    document.getElementById('printNoNds').innerText = noNds.toLocaleString() + ' руб.';
+    document.getElementById('printRowWithNds').style.display = isWithNdsChecked ? 'flex' : 'none';
+    document.getElementById('printWithNds').innerText = withNds.toLocaleString() + ' руб.';
+
+    const cashBlock = document.getElementById('cashPaymentDetailsBlock');
+    if (cashBlock) {
+        cashBlock.style.display = (isNoNdsChecked || isWithNdsChecked) ? 'none' : 'block';
+    }
+
+    updateModalTextContent();
+}
+
+function generateOrderText() {
+    const sizeSelect = document.getElementById('sizeSelect');
+    const sizeText = sizeSelect && sizeSelect.selectedIndex >= 0 ? sizeSelect.options[sizeSelect.selectedIndex].text : '';
+    const isRaspashonka = document.getElementById('raspashonkaCheck').checked;
+    const insulationObj = document.querySelector('.insulation-box:checked');
+
+    const pData = getSelectedPricingData();
+    const {
+        isBK,
+        outerFinishName,
+        outerFinishPrice,
+        isColoredProflist,
+        selectedColorText,
+        finishName,
+        finishPrice
+    } = pData;
+
+    let hasPartitions = false;
+    document.querySelectorAll('.extra-option-check:checked').forEach(cb => {
+        let name = cb.getAttribute('data-name');
+        if (name && name.toLowerCase().includes('перегородка')) {
+            hasPartitions = true;
+        }
+    });
+
+    let selectedMetalDoor = null;
+    let selectedWindows = [];
+
+    document.querySelectorAll('.price-check:checked:not(.finish-box):not(.insulation-box):not(.outer-finish-box)').forEach(cb => {
+        if (!cb.classList.contains('custom-pos-check')) {
+            let name = cb.getAttribute('data-name');
+            const itemRow = cb.closest('.item-row');
+            const qty = parseInt(itemRow.querySelector('.qty-input').value) || 1;
+            
+            if (name && name.toLowerCase().includes('окно')) {
+                selectedWindows.push({ name: name, qty: qty });
+            }
+            if (name && name.toLowerCase().includes('металлическая дверь')) {
+                selectedMetalDoor = { name: name, qty: qty };
+            }
+        }
+    });
+
+    const deliveryEnabled = document.getElementById('deliveryEnable').checked;
+    const deliveryCost = deliveryEnabled ? (parseInt(document.getElementById('deliveryPriceManual').value) || 0) : 0;
+    
+    let goodsTotal = outerFinishPrice + finishPrice;
+
+    if (insulationObj) {
+        const itemRow = insulationObj.closest('.item-row');
+        const insulationQty = parseInt(itemRow.querySelector('.qty-input').value) || 1;
+        const manualP = parseInt(itemRow.querySelector('.price-input-manual').value) || 0;
+        const overridePVal = itemRow.querySelector('.price-input-override').value;
+        goodsTotal += (overridePVal !== "" ? roundTo100(overridePVal) : manualP) * insulationQty;
+    }
+
+    document.querySelectorAll('.price-check:checked:not(.finish-box):not(.insulation-box):not(.outer-finish-box)').forEach(cb => {
+        const item = cb.closest('.item');
+        const qty = parseInt(item.querySelector('.qty-input').value) || 1;
+        if (cb.classList.contains('custom-pos-check')) {
+            const overridePriceVal = item.querySelector('.custom-price-input').value;
+            goodsTotal += (overridePriceVal !== "" ? roundTo100(overridePriceVal) : 0) * qty;
+        } else {
+            const name = cb.getAttribute('data-name');
+            const itemRow = cb.closest('.item-row') || item.querySelector('.item-row');
+            const manualPrice = parseInt(itemRow.querySelector('.price-input-manual').value) || 0;
+            const overridePriceVal = itemRow.querySelector('.price-input-override').value;
+            let price = (overridePriceVal !== "" ? roundTo100(overridePriceVal) : manualPrice) * qty;
+            
+            if (name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                price = 4000;
+            }
+            goodsTotal += price;
+        }
+    });
+
+    const finalTotal = goodsTotal + deliveryCost;
+
+    const dateVal = document.getElementById('modalDate').value;
+    const advanceVal = document.getElementById('modalAdvance').value;
+    const clientName = document.getElementById('modalClientName').value.trim();
+    const clientPhone = document.getElementById('modalClientPhone').value.trim();
+    const clientAddr = document.getElementById('modalClientAddr').value.trim();
+
+    const isNoNdsChecked = document.getElementById('checkNoNds').checked;
+    const isWithNdsChecked = document.getElementById('checkWithNds').checked;
+
+    const advanceNumeric = parseFloat(advanceVal.replace(/\s+/g, '')) || 0;
+    const driverCashVal = finalTotal - advanceNumeric;
+
+    const frameText = (insulationObj && !isBK) ? "Каркас: 100х50" : (isBK ? "Каркас: швеллер гнутый 100х50" : "Каркас: 50х50");
+
+    let outerTextBK = isColoredProflist
+        ? `Профлист (${selectedColorText})`
+        : (outerFinishName && outerFinishName !== "Профлист оцинкованный" ? outerFinishName : "Профлист");
+
+    let outerTextCabin = "Вагонка С (не обработана антисептиком)";
+    if (isColoredProflist) {
+        outerTextCabin = `Профлист (${selectedColorText})`;
+    } else if (outerFinishName && outerFinishName !== "Вагонка С") {
+        outerTextCabin = outerFinishName;
+    }
+
+    if (currentModalType === 'client') {
+        const kmVal = document.getElementById('distance').value || '0';
+
+        let text = `Заявка на ${dateVal}\n\n`;
+        
+        if (isBK) {
+            text += `Новый блок-контейнер ${sizeText}\n\n`;
+            text += `${frameText}\n`;
+            text += `Внешняя отделка: ${outerTextBK}\n`;
+            text += `Внутренняя отделка: ${finishName}\n`;
+            if (insulationObj) {
+                text += `Утепление: 100 мм (минвата)\n`;
+            } else if (finishName !== "Без отделки и утепления") {
+                text += `Утепление: 50 мм (пол, потолок, стены)\n`;
+            }
+            text += `Кровля: односкатная (профлист оцинкованный)\n`;
+            text += `Пол: доска обрезная 100х25 мм + ОСБ\n`;
+            
+            if (selectedWindows.length > 0) {
+                selectedWindows.forEach(w => {
+                    let wLine = `Окно: ${w.name}`;
+                    if (w.name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                        wLine = `Окно: деревянное 60х80 см с одним стеклом, открывающееся 2 шт.`;
+                    }
+                    text += `${wLine}\n`;
+                });
+            } else {
+                text += `Окно: деревянное 70×80 см, двойное остекление\n`;
+            }
+
+            if (selectedMetalDoor) {
+                text += `Дверь: ${selectedMetalDoor.name}\n`;
+            } else {
+                text += `Дверь: деревянная каркасная 1,80×80\n`;
+            }
+
+            text += `Пол черновой: сплошной\n`;
+            text += `Пароизоляция: да\n`;
+        } else {
+            text += `Новая бытовка ${sizeText} (по крыше)\n`;
+            if (isRaspashonka) {
+                if (hasPartitions) {
+                    text += `Тип: распашонка с перегородками\n\n`;
+                } else {
+                    text += `Тип: распашонка без перегородок\n\n`;
+                }
+            } else {
+                text += `\n`;
+            }
+            text += `${frameText}\n`;
+            text += `Внешняя отделка: ${outerTextCabin}\n`;
+            text += `Внутренняя отделка: ${finishName}\n`;
+            text += `Кровля: Односкатная (профлист оцинкованный 0,35)\n`;
+            text += `Высота 2.1-1.9\n`;
+            if (insulationObj) {
+                text += `Утепление: 100 мм (минвата)\n`;
+            } else if (finishName !== "Без отделки и утепления") {
+                text += `Утепление: 50 мм (пол, потолок, стены)\n`;
+            }
+
+            if (selectedWindows.length > 0) {
+                selectedWindows.forEach(w => {
+                    let wLine = `Окно: ${w.name}`;
+                    if (w.name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                        wLine = `Окно: деревянное 60х80 см с одним стеклом, открывающееся 2 шт.`;
+                    }
+                    text += `${wLine}\n`;
+                });
+            } else {
+                text += `Окно: деревянное 60х80 см с одним стеклом, открывающееся\n`;
+            }
+
+            text += `Пол:  доска обрезная 100х25 мм + ОСБ\n`;
+
+            if (selectedMetalDoor) {
+                text += `Дверь: ${selectedMetalDoor.name}\n`;
+            } else {
+                text += `Дверь: каркасная деревянная 1,8х0,8 м\n`;
+            }
+
+            text += `Черновой пол: доска с расстоянием 15-25 см\n`;
+            text += `Лыжи 100*100\n`;
+            text += `Пароизоляция: да\n`;
+        }
+
+        document.querySelectorAll('.price-check:checked:not(.finish-box):not(.insulation-box):not(.outer-finish-box)').forEach(cb => {
+            const item = cb.closest('.item');
+            if (cb.classList.contains('custom-pos-check')) {
+                const nameInputId = cb.getAttribute('data-name-input');
+                let customName = document.getElementById(nameInputId).value.trim();
+                if (customName) text += `${customName}\n`;
+            } else {
+                let name = cb.getAttribute('data-name');
+                if (name && (name.toLowerCase().includes('окно') || name.toLowerCase().includes('металлическая дверь'))) {
+                    return;
+                }
+                text += `${name}\n`;
+            }
+        });
+
+        text += `\n---\nВ комплекте:\n`;
+        text += `Блоки (для установки бытовки)\n\n`;
+     
+        text += `Стоимость бытовки ${goodsTotal.toLocaleString()} руб.\n`;
+        if (deliveryEnabled) {
+            text += `Доставка ${deliveryCost.toLocaleString()} (${kmVal}км)\n`;
+        }
+        text += `Итого: ${finalTotal.toLocaleString()} руб.\n`;
+
+        if (isNoNdsChecked) {
+            const noNdsVal = Math.round(finalTotal * 1.13);
+            text += `Без НДС 13% ${noNdsVal.toLocaleString()} руб.\n`;
+        }
+        if (isWithNdsChecked) {
+            const withNdsVal = Math.round(finalTotal * 1.22);
+            text += `С НДС 22% ${withNdsVal.toLocaleString()} руб.\n`;
+        }
+
+        if (!isNoNdsChecked && !isWithNdsChecked) {
+            text += `\nПредоплата ${advanceNumeric.toLocaleString()} руб.\n`;
+            text += `тел. +7 (985) 128-33-85\n`;
+            text += `Ольга К. Т-Банк\n\n`;
+            text += `Сообщение о назначении платежа указывать не нужно!\n\n`;
+            text += `${driverCashVal.toLocaleString()} руб. оплата водителю НАЛИЧНЫМИ\n\n`;
+        }
+
+        if (clientName || clientPhone || clientAddr) {
+            text += `\n`;
+            if (clientName) text += `Заказчик: ${clientName}\n`;
+            if (clientPhone) text += `Контактный номер: ${clientPhone}\n`;
+            if (clientAddr) text += `Адрес объекта: ${clientAddr}\n`;
+        }
+
+        return text;
+    }
+
+    let text = `Заявка на ${dateVal}\n`;
+    text += `Тег\n`;
+    text += `Лид от\n`;
+    
+    if (deliveryEnabled) {
+        text += `Доставка: ЩЁЛКОВО\n\n`;
+    } else {
+        text += `Доставка: самовывоз\n\n`;
+    }
+
+    if (isBK) {
+        text += `Новый блок-контейнер ${sizeText}\n\n`;
+        text += `${frameText}\n`;
+        text += `Внешняя отделка: ${outerTextBK}\n`;
+        text += `Внутренняя отделка: ${finishName}\n`;
+        if (insulationObj) {
+            text += `Утепление: 100 мм (минвата)\n`;
+        } else if (finishName !== "Без отделки и утепления") {
+            text += `Утепление: 50 мм (пол, потолок, стены)\n`;
+        }
+        text += `Кровля: односкатная (профлист оцинкованный)\n`;
+        text += `Пол: доска обрезная 100х25 мм + ОСБ\n`;
+        
+        if (selectedWindows.length > 0) {
+            selectedWindows.forEach(w => {
+                let wLine = `Окно: ${w.name}`;
+                if (w.name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                    wLine = `Окно: деревянное 60х80 см с одним стеклом, открывающееся 2 шт.`;
+                }
+                text += `${wLine}\n`;
+            });
+        } else {
+            text += `Окно: деревянное 70×80 см, двойное остекление\n`;
+        }
+
+        if (selectedMetalDoor) {
+            text += `Дверь: ${selectedMetalDoor.name}\n`;
+        } else {
+            text += `Дверь: деревянная каркасная 1,80×80\n`;
+        }
+
+        text += `Пол черновой: сплошной\n`;
+        text += `Пароизоляция: да\n`;
+    } else {
+        text += `Новая бытовка ${sizeText} (по крыше)\n`;
+        if (isRaspashonka) {
+            if (hasPartitions) {
+                text += `Тип: распашонка с перегородками\n\n`;
+            } else {
+                text += `Тип: распашонка без перегородок\n\n`;
+            }
+        } else {
+            text += `\n`;
+        }
+        text += `${frameText}\n`;
+        text += `Внешняя отделка: ${outerTextCabin}\n`;
+        text += `Внутренняя отделка: ${finishName}\n`;
+        text += `Кровля: Односкатная (профлист оцинкованный 0,35)\n`;
+        text += `Высота 2.1-1.9\n`;
+        if (insulationObj) {
+            text += `Утепление: 100 мм (минвата)\n`;
+        } else if (finishName !== "Без отделки и утепления") {
+            text += `Утепление: 50 мм (пол, потолок, стены)\n`;
+        }
+
+        if (selectedWindows.length > 0) {
+            selectedWindows.forEach(w => {
+                let wLine = `Окно: ${w.name}`;
+                if (w.name === "Деревянное окно с одним стеклом, 60х80 см (дополнительно)") {
+                    wLine = `Окно: деревянное 60х80 см с одним стеклом, открывающееся 2 шт.`;
+                }
+                text += `${wLine}\n`;
+            });
+        } else {
+            text += `Окно: деревянное 60х80 см с одним стеклом, открывающееся\n`;
+        }
+
+        text += `Пол: доска обрезная 100х25 мм + ОСБ\n`;
+
+        if (selectedMetalDoor) {
+            text += `Дверь: ${selectedMetalDoor.name}\n`;
+        } else {
+            text += `Дверь: каркасная деревянная 1,8х0,8 м\n`;
+        }
+
+        text += `Черновой пол: доска с расстоянием 15-25 см\n`;
+        text += `Лыжи 100*100\n`;
+        text += `Пароизоляция: да\n`;
+    }
+
+    document.querySelectorAll('.price-check:checked:not(.finish-box):not(.insulation-box):not(.outer-finish-box)').forEach(cb => {
+        const item = cb.closest('.item');
+        if (cb.classList.contains('custom-pos-check')) {
+            const nameInputId = cb.getAttribute('data-name-input');
+            let customName = document.getElementById(nameInputId).value.trim();
+            if (!customName) customName = "Своя позиция";
+            const qty = parseInt(item.querySelector('.qty-input').value) || 1;
+            text += `${customName} - ${qty} шт.\n`;
+        } else {
+            let name = cb.getAttribute('data-name');
+            if (name && (name.toLowerCase().includes('окно') || name.toLowerCase().includes('металлическая дверь'))) {
+                return;
+            }
+            if (name.includes('без двери')) {
+                const height = isBK ? '2.4 м' : '2.3 м';
+                name = name.replace(/2\.3-2\.4 м/, height);
+            }
+            const itemRow = item.querySelector('.item-row');
+            const qty = parseInt(itemRow.querySelector('.qty-input').value) || 1;
+            text += `${name} - ${qty} шт.\n`;
+        }
+    });
+
+    text += `\n---\nВ комплекте:\n`;
+    text += `Блоки (для установки бытовки)\n\n`;
+
+    const noNds = Math.round(finalTotal * 1.13);
+    const withNds = Math.round(finalTotal * 1.22);
+
+    text += `\n`;
+    text += `Стоимость бытовки ${goodsTotal.toLocaleString()} руб.\n`;
+    if (deliveryEnabled) {
+        text += `Доставка: ${deliveryCost.toLocaleString()} руб.\n`;
+    }
+    text += `Итого: ${finalTotal.toLocaleString()} руб.\n`;
+    
+    if (isNoNdsChecked) {
+        text += `БЕЗ НДС ${noNds.toLocaleString()} руб.\n`;
+    }
+    if (isWithNdsChecked) {
+        text += `НДС ${withNds.toLocaleString()} руб.\n`;
+    }
+
+    if (!isNoNdsChecked && !isWithNdsChecked) {
+        text += `\n`;
+        text += `Предоплата ${advanceNumeric.toLocaleString()} руб.\n`;
+        text += `${driverCashVal.toLocaleString()} руб. оплата водителю НАЛИЧНЫМИ\n`;
+    }
+
+    if (clientName || clientPhone || clientAddr) {
+        text += `\n`;
+        if (clientName) text += `Заказчик: ${clientName}\n`;
+        if (clientPhone) text += `Контактный номер: ${clientPhone}\n`;
+        if (clientAddr) text += `Адрес объекта: ${clientAddr}\n`;
+    }
+
+    text += `\nПланировка: подтверждена и прилагается\n`;
+    text += `Заезд: свободный со слов клиента. Фото и видео прилагается\n\n`;
+    text += `Ответственный менеджер:`;
+
+    return text;
+}
+
+function updateModalTextContent() {
+    document.getElementById('modalTextPreview').value = generateOrderText();
+}
+
+function openClientOrderModal() {
+    currentModalType = 'production';
+    document.getElementById('modalTitle').innerText = "Заявка для производства";
+    document.getElementById('modalActionBtn').innerText = "Заявка для производства";
+    document.getElementById('modalInputsGrid').style.display = 'grid';
+    
+    document.getElementById('modalClientName').value = document.getElementById('clientNameInput').value || '';
+    document.getElementById('modalClientPhone').value = document.getElementById('clientPhoneInput').value || '';
+    document.getElementById('modalClientAddr').value = document.getElementById('clientAddrInput').value || '';
+
+    updateModalTextContent();
+    document.getElementById('orderModal').style.display = 'flex';
+}
+
+function openClientTextModal() {
+    currentModalType = 'client';
+    document.getElementById('modalTitle').innerText = "Заявка для клиента";
+    document.getElementById('modalActionBtn').innerText = "Заявка для клиента";
+    document.getElementById('modalInputsGrid').style.display = 'grid';
+    
+    document.getElementById('modalClientName').value = '';
+    document.getElementById('modalClientPhone').value = '';
+    document.getElementById('modalClientAddr').value = '';
+
+    updateModalTextContent();
+    document.getElementById('orderModal').style.display = 'flex';
+}
+
+function closeClientOrderModal() {
+    document.getElementById('orderModal').style.display = 'none';
+}
+
+function modalAction() {
+    copyModalText();
+}
+
+function copyModalText() {
+    const textarea = document.getElementById('modalTextPreview');
+    textarea.select();
+    document.execCommand('copy');
+    alert("Текст скопирован в буфер обмена!");
+    closeClientOrderModal();
+}
+
+function resetCalculator() { if(!confirm("Очистить все данные?")) return; location.reload(); }
+document.getElementById('docDate').innerText = new Date().toLocaleDateString('ru-RU');
+document.getElementById('docNumber').innerText = 'КП-' + Math.floor(1000 + Math.random() * 9000);
+</script>
+</body>
+</html>
